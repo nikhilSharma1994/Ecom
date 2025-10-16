@@ -24,7 +24,7 @@ const App = () => {
 
 
   return (
-    <div className='bg-red-500 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen'>
       <ToastContainer/>
       {token === "" ? <Login setToken={setToken} /> 
         : <>
@@ -37,11 +37,6 @@ const App = () => {
               <Routes>
                 <Route path='/add' element={<Add  token={token}/>} />
                 <Route path='/list' element={<List  token={token}/>} />
-
-
-
-
-                
                 <Route path='/orders' element={<Orders  token={token}/>} />
               </Routes>
             </div>
