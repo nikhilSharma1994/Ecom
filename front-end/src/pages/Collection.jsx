@@ -3,15 +3,21 @@ import { ShopContext } from '../context/ShopContext'
 import { assets } from '../assets/assets';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
+
+
 
 const Collection = () => {
+  
 
   const { products , search , showSearch } = useContext(ShopContext);
   const [showFilter,setShowFilter] = useState(false);
-  const [filterProducts,setFilterProducts] = useState([]);
+  const [filterProducts,setFilterProducts] = useState(products);
   const [category,setCategory] = useState([]);
   const [subCategory,setSubCategory] = useState([]);
   const [sortType,setSortType] = useState('relavent')
+  const [priceRange,setPriceRange]= useState([100,500]);
 
   const toggleCategory = (e) => {
 
@@ -35,7 +41,6 @@ const Collection = () => {
   }
 
   const applyFilter = () => {
-
     let productsCopy = products.slice();
 
     if (showSearch && search) {
@@ -50,6 +55,12 @@ const Collection = () => {
       productsCopy = productsCopy.filter(item => subCategory.includes(item.subCategory))
     }
 
+      if (priceRange && priceRange.length === 2) {
+      const [minPrice, maxPrice] = priceRange;
+      productsCopy = productsCopy.filter(
+        item => item.price >= minPrice && item.price <= maxPrice
+      );
+    }
     setFilterProducts(productsCopy)
 
   }
@@ -74,9 +85,17 @@ const Collection = () => {
 
   }
 
+
+  const resetFilters = () => {
+    setCategory([]);
+    setSubCategory([]);
+    setPriceRange([100,900]);
+    setFilterProducts(products);
+  } 
+
   useEffect(()=>{
       applyFilter();
-  },[category,subCategory,search,showSearch,products])
+  },[category,subCategory,search,showSearch,products, priceRange])
 
   useEffect(()=>{
     sortProduct();
@@ -89,38 +108,64 @@ const Collection = () => {
       <div className='min-w-60'>
         <p onClick={()=>setShowFilter(!showFilter)} className='my-2 text-xl flex items-center cursor-pointer gap-2'>FILTERS
           <img className={`h-3 sm:hidden ${showFilter ? 'rotate-90' : ''}`} src={assets.dropdown_icon} alt="" />
+        <button className=' text-black px-1 py-1 ml-6  hover:text-red-500 text-sm cursor-pointer' onClick={resetFilters}>Clear All Filters </button>
         </p>
+        
         {/* Category Filter */}
         <div className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? '' :'hidden'} sm:block`}>
           <p className='mb-3 text-sm font-medium'>CATEGORIES</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Men'} onChange={toggleCategory}/> Men
+              <input className='w-3' type="checkbox" value={'Men'} onChange={toggleCategory}  checked={category.includes("Men")}/> Men
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Women'} onChange={toggleCategory}/> Women
+              <input className='w-3' type="checkbox" value={'Women'} onChange={toggleCategory} checked={category.includes("Women")}/> Women
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Kids'} onChange={toggleCategory}/> kids
+              <input className='w-3' type="checkbox" value={'Kids'} onChange={toggleCategory} checked={category.includes("Kids")} /> kids
             </p>
           </div>
         </div>
+            {/* Price slider  */}
+      
         {/* SubCategory Filter */}
         <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? '' :'hidden'} sm:block`}>
           <p className='mb-3 text-sm font-medium'>TYPE</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Topwear'} onChange={toggleSubCategory}/> Topwear
+              <input className='w-3' type="checkbox" value={'Topwear'} onChange={toggleSubCategory} checked={subCategory.includes("Topwear")}/> Topwear
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Bottomwear'} onChange={toggleSubCategory}/> Bottomwear
+              <input className='w-3' type="checkbox" value={'Bottomwear'} onChange={toggleSubCategory} checked={subCategory.includes("Bottomwear")}/> Bottomwear
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Winterwear'} onChange={toggleSubCategory}/> Winterwear
+              <input className='w-3' type="checkbox" value={'Winterwear'} onChange={toggleSubCategory} checked={subCategory.includes("Winterwear")}/> Winterwear
             </p>
           </div>
         </div>
+
+        {/* price slider  */}
+        <div  className='border border-gray-300 pl-5 py-3 my-5'>
+        <p className='mb-3 text-sm font-medium'>PRICE RANGE</p>
+
+         <div className='pr-5'>
+            <div className='mb-2 text-sm'>
+              Price: ${priceRange[0]} - ${priceRange[1]}
+            </div>
+            <Slider
+              range
+              min={100}
+              max={500}
+              step={50}                  // you can adjust step
+              value={priceRange}
+              onChange={setPriceRange}   // updates dynamically
+            />
+          </div>
       </div>
+      
+      </div>
+
+  
 
       {/* Right Side */}
       <div className='flex-1'>
